@@ -4,10 +4,10 @@ require "message_dir/version"
 
 Gem::Specification.new do |s|
   s.name        = "message_dir"
-  s.version     = Message::VERSION
+  s.version     = MessageDir::VERSION
   s.authors     = ["Hartog C. de Mik"]
   s.email       = ["hartog.de.mik@gmail.com"]
-  s.homepage    = "https://github.com/coffeeaddict/message"
+  s.homepage    = "https://github.com/coffeeaddict/message_dir"
   s.summary     = %q{Maildir like messages}
   s.description = %q{Handle slow network messages with care}
 
