@@ -1,0 +1,64 @@
+= Message dir
+
+A directory, with messages. Like your Maildir/
+
+Meant to be used to safely store incoming messages from any slow connection
+
+== Message dir DSL
+
+  # create
+  dir = MessageDir.new("/path/to/store")
+  msg = dir.new do |fh|
+    fh.puts info_from_slow_connection
+  end
+
+  # move a message to cur/
+  dir.cur(msg)
+  msg.cur!
+
+  # get a list of all messages
+  dir.messages
+
+  # get a list of all messages in new/
+  dir.messages(:new)
+
+  # or cur
+  dir.messages(:cur)
+
+  # work on a message (moves it to tmp/ for the duration of a block)
+  dir.process(msg, File::WRONLY|File::APPEND) do |fh|
+    fh.puts more_info
+  end
+
+  msg.process(File::WRONLY|File::TRUNC) do |fh|
+    fh.puts new_contents
+  end
+
+  # remove a message
+  msg = dir.messages(:new).first
+  dir.rm(msg) # => raise exception, we dont like to remove 'new' messages
+
+  msg = dir.msgs(:cur).first
+  msg.rm!
+
+  # lock a message
+  msg.lock! do
+    # something with the locked message
+  end
+  msg.locked? # => false
+
+  dir.lock(msg) do
+  end
+
+== Message acts as file
+
+A message is not an implementation of IO or File but it acts in the same way.
+Use that to your advantage.
+
+== Message safety
+
+A lot is done to ensure the safe handling of messages
+
+* Messages are created and processed in tmp/
+* A message fh is always opened with File::SYNC - slow but trustworthy
+* Locks are carried over processes (and crashes) using .lock files

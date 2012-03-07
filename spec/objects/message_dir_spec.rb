@@ -1,54 +1,6 @@
 require 'spec_helper'
 require 'tmpdir'
 
-=begin
-= Message dir DSL
-
-  # create
-  dir = MessageDir.new("/path/to/store")
-  msg = dir.new do |fh|
-    fh.puts info_from_slow_connection
-  end
-
-  # move a message to cur
-  msg.cur!
-  dir.cur(msg)
-
-  # get a list of all messages
-  dir.messages
-
-  # get a list of all messages in new
-  dir.messages(:new)
-
-  # or cur
-  dir.messages(:cur)
-
-  # work on a message (move it to tmp for the duration of a block)
-  dir.process(msg, File::WRONLY|File::APPEND) do |fh|
-    fh.puts more_info
-  end
-
-  msg.process(File::WRONLY|File::TRUNC) do |fh|
-    fh.puts new_contents
-  end
-
-  # remove a message
-  msg = dir.messages(:new).first
-  dir.rm(msg) # => raise exception, we dont like to remove 'new' messages
-
-  msg = dir.msgs(:cur).first
-  msg.rm!
-
-  # lock a message
-  msg.lock! do
-    # something with the locked message
-  end
-  msg.locked? # => false
-
-  dir.lock(msg) do
-  end
-=end
-
 describe MessageDir do
   before :each do
     @path = Dir.mktmpdir(nil, '/tmp')
