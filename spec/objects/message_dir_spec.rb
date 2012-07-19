@@ -298,4 +298,41 @@ describe MessageDir do
       File.exists?(msg.path).should_not be_false
     end
   end
+
+  describe "errors" do
+    it "should create an .err file on error in block" do
+      msg = subject.new do |fh|
+        fh.puts "I am new"
+        fh.error = "I have errors"
+      end
+      File.exists?(msg.path).should be_true
+      File.exists?(msg.path + ".err").should be_true
+    end
+
+    it "should create an .err file on error" do
+      msg = subject.new do |fh|
+        fh.puts "I am new"
+      end
+      msg.error = "I have errors"
+
+      File.exists?(msg.path).should be_true
+      File.exists?(msg.path + ".err").should be_true
+    end
+
+    it "should return the contents of the .err file" do
+      msg = subject.new do |fh|
+        fh.error = "No waaaaaay"
+      end
+
+      msg.error.should == "No waaaaaay\n"
+    end
+
+    it ".err files should be skipped in listings" do
+      msg = subject.new do |fh|
+        fh.error = "error"
+      end
+
+     subject.msgs.should_not be_empty
+   end
+  end
 end

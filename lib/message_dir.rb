@@ -58,7 +58,7 @@ class MessageDir
     # find all the wanted paths
     paths = spots.collect do |spot|
       Dir[File.join(path.send(spot), '*')].select do |path|
-        path !~ /\.lock$/ && File.file?(path)
+        path !~ /\.(lock|err)$/ && File.file?(path)
       end
     end.flatten
 

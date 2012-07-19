@@ -45,7 +45,11 @@ class MessageDir
       # make sure them files are synced
       mode |= File::SYNC unless mode & File::SYNC == File::SYNC
 
-      @io = File.open(self.path, mode, &block)
+      @io = File.open(self.path, mode)
+
+      if block_given?
+        yield self
+      end
     end
 
     def fh
@@ -56,7 +60,11 @@ class MessageDir
       raise "Can't move a locked file" if locked?
 
       close
+      if self.error?
+        FileUtils.mv(self.path + ".err", File.join(path, self.guid + ".err"))
+      end
       FileUtils.mv(self.path, File.join(path, self.guid))
+
       @path = path
       open
     end
@@ -119,6 +127,21 @@ class MessageDir
         File.unlink(lock_file)
       end
       @locked = false
+    end
+
+    def error?
+      File.exists?(self.path + ".err")
+    end
+
+    def error
+      return nil unless self.error?
+      File.read(self.path + ".err")
+    end
+
+    def error=(msg)
+      err = File.open(self.path + ".err", File::WRONLY|File::CREAT|File::TRUNC)
+      err.puts msg
+      err.close
     end
 
     def method_missing(method, *args, &block)
