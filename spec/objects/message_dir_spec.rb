@@ -334,5 +334,23 @@ describe MessageDir do
 
      subject.msgs.should_not be_empty
    end
+
+   it "should remove .err files when removing the message" do
+     msg = subject.new do |fh|
+       fh.error = "error"
+     end
+     msg.rm
+     File.exists?(msg.path + ".err").should_not be_true
+   end
+
+   it "should accept block form for error" do
+     msg = subject.new
+     msg.error do |efh|
+       efh.puts "Story of my live."
+       efh.puts "\n"
+       efh.puts "..."
+     end
+     msg.error.should =~ /Story of my live.\n\n.../m
+   end
   end
 end

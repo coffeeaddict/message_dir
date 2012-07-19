@@ -91,7 +91,10 @@ class MessageDir
 
   def rm(msg)
     return false if msg.locked?
-    File.unlink(msg.path) == 1 ? true : false
+    files = [ msg.path ]
+    files << msg.error_file if msg.error?
+
+    File.unlink(*files) == files.count ? true : false
   end
 
   class Path

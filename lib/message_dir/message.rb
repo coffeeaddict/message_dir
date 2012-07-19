@@ -129,19 +129,27 @@ class MessageDir
       @locked = false
     end
 
-    def error?
-      File.exists?(self.path + ".err")
+    def error_file
+      self.path + ".err"
     end
 
-    def error
-      return nil unless self.error?
-      File.read(self.path + ".err")
+    def error?
+      File.exists?(self.error_file)
+    end
+
+    def error(&block)
+      unless block_given?
+        return nil unless self.error?
+        File.read(self.error_file)
+      else
+        File.open(self.error_file, File::WRONLY|File::CREAT|File::TRUNC, &block)
+      end
     end
 
     def error=(msg)
-      err = File.open(self.path + ".err", File::WRONLY|File::CREAT|File::TRUNC)
-      err.puts msg
-      err.close
+      self.error do |fh|
+        fh.puts msg
+      end
     end
 
     def method_missing(method, *args, &block)
